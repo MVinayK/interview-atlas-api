@@ -4,7 +4,7 @@ server:
 interview-atlas:
   ai:
     provider: "gemini"
-    api-key: ${INTERVIEW_ATLAS_AI_API_KEY:}
+    api-key: ${INTERVIEW_ATLAS_AI_API_KEY}
     base-url: ""
     model: "gemini-2.5-flash-lite"
 
