@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
 
 @Component
 public class GeminiProvider implements AiProvider {
@@ -47,14 +48,11 @@ public class GeminiProvider implements AiProvider {
         )
     );
 
-    String url = aiProperties.resolvedBaseUrl()
-            + "/models/" + aiProperties.model()
-            + ":generateContent?key=" + aiProperties.apiKey();
-
-    System.out.println("URL = " + url.replace(aiProperties.apiKey(), "MASKED"));
-
     GeminiGenerateContentResponse response = AiRetrySupport.execute(() -> restClient.post()
-            .uri(url)
+            .uri(uriBuilder -> uriBuilder
+                    .path("/models/{model}:generateContent")
+                    .build(aiProperties.model()))
+            .header("X-goog-api-key", aiProperties.apiKey())
             .contentType(MediaType.APPLICATION_JSON)
             .body(request)
             .retrieve()
