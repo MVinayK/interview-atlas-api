@@ -21,7 +21,7 @@ public class GeminiProvider implements AiProvider {
     this.aiProperties = aiProperties;
     this.restClient = restClientBuilder
         .baseUrl(aiProperties.resolvedBaseUrl())
-        .defaultHeader("x-goog-api-key", aiProperties.apiKey())
+        //.defaultHeader("x-goog-api-key", aiProperties.apiKey())
         .defaultHeader("Content-Type", "application/json")
         .build();
   }
@@ -47,8 +47,14 @@ public class GeminiProvider implements AiProvider {
         )
     );
 
+    String key = aiProperties.apiKey();
+    System.out.println("KEY USED = [" + (key == null ? "null" : key.substring(0, 6) + "...") + "]");
+
     GeminiGenerateContentResponse response = AiRetrySupport.execute(() -> restClient.post()
-        .uri("/models/{model}:generateContent", aiProperties.model())
+            .uri(uriBuilder -> uriBuilder
+                    .path("/models/{model}:generateContent")
+                    .queryParam("key", aiProperties.apiKey())
+                    .build(aiProperties.model()))
         .contentType(MediaType.APPLICATION_JSON)
         .body(request)
         .retrieve()
