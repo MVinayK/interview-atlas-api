@@ -47,18 +47,18 @@ public class GeminiProvider implements AiProvider {
         )
     );
 
-    String key = aiProperties.apiKey();
-    System.out.println("KEY USED = [" + (key == null ? "null" : key.substring(0, 6) + "...") + "]");
+    String url = aiProperties.resolvedBaseUrl()
+            + "/models/" + aiProperties.model()
+            + ":generateContent?key=" + aiProperties.apiKey();
+
+    System.out.println("URL = " + url.replace(aiProperties.apiKey(), "MASKED"));
 
     GeminiGenerateContentResponse response = AiRetrySupport.execute(() -> restClient.post()
-            .uri(uriBuilder -> uriBuilder
-                    .path("/models/{model}:generateContent")
-                    .queryParam("key", aiProperties.apiKey())
-                    .build(aiProperties.model()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(request)
-        .retrieve()
-        .body(GeminiGenerateContentResponse.class));
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+            .retrieve()
+            .body(GeminiGenerateContentResponse.class));
 
     return response == null ? "" : response.firstText();
   }
